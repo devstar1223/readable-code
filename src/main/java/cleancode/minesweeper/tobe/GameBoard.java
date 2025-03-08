@@ -1,6 +1,6 @@
 package cleancode.minesweeper.tobe;
 
-import cleancode.minesweeper.tobe.cell.Cell2;
+import cleancode.minesweeper.tobe.cell.Cell;
 import cleancode.minesweeper.tobe.cell.EmptyCell;
 import cleancode.minesweeper.tobe.cell.LandMineCell;
 import cleancode.minesweeper.tobe.cell.NumberCell;
@@ -13,39 +13,36 @@ public class GameBoard {
 
     private final int landMineCount;
 
-    private final Cell2[][] board;
+    private final Cell[][] board;
 
-//    public GameBoard(int rowSize, int colSize) {
-//        board = new Cell[rowSize][colSize];
-//    }
 
     public GameBoard(GameLevel gameLevel){
         int rowSize = gameLevel.getRowSize();
         int colSize = gameLevel.getColSize();
-        board = new Cell2[rowSize][colSize];
+        board = new Cell[rowSize][colSize];
 
         landMineCount = gameLevel.gelLandMineCount();
     }
 
     public void flag(int rowIndex, int colIndex) {
-        Cell2 cell = findCell(rowIndex, colIndex);
+        Cell cell = findCell(rowIndex, colIndex);
         cell.flag();
     }
 
     public void open(int rowIndex, int colIndex) {
-        Cell2 cell = findCell(rowIndex,colIndex);
+        Cell cell = findCell(rowIndex,colIndex);
         cell.open();
     }
 
     public boolean isLandMineCell(int rowIndex, int colIndex) {
-        Cell2 cell = findCell(rowIndex, colIndex);
+        Cell cell = findCell(rowIndex, colIndex);
         return cell.isLandMine();
     }
 
     public boolean isAllCellChecked() {
         return Arrays.stream(board)
                 .flatMap(Arrays::stream)
-                .allMatch(Cell2::isChecked);
+                .allMatch(Cell::isChecked);
     }
 
     public void initiallizeGame() {
@@ -111,11 +108,11 @@ public class GameBoard {
     }
 
     public String getSign(int rowIndex, int colIndex) {
-        Cell2 cell = findCell(rowIndex, colIndex);
+        Cell cell = findCell(rowIndex, colIndex);
         return cell.getSign();
     }
 
-    private Cell2 findCell(int rowIndex, int colIndex) {
+    private Cell findCell(int rowIndex, int colIndex) {
         return board[rowIndex][colIndex];
     }
 
@@ -155,12 +152,12 @@ public class GameBoard {
     }
 
     private boolean doesCellHaveLandMineCount(int row, int col) {
-        Cell2 cell = findCell(row,col);
+        Cell cell = findCell(row,col);
         return cell.hasLandMineCount();
     }
 
     private boolean isOpenedCell(int row, int col) {
-        Cell2 cell = findCell(row,col);
+        Cell cell = findCell(row,col);
         return cell.isOpened();
     }
 }
