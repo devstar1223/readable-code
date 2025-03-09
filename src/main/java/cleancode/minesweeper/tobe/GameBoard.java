@@ -1,17 +1,12 @@
 package cleancode.minesweeper.tobe;
 
-import cleancode.minesweeper.tobe.cell.Cell;
-import cleancode.minesweeper.tobe.cell.EmptyCell;
-import cleancode.minesweeper.tobe.cell.LandMineCell;
-import cleancode.minesweeper.tobe.cell.NumberCell;
+import cleancode.minesweeper.tobe.cell.*;
 import cleancode.minesweeper.tobe.gamelevel.GameLevel;
 import cleancode.minesweeper.tobe.position.CellPosition;
+import cleancode.minesweeper.tobe.position.CellPositions;
 import cleancode.minesweeper.tobe.position.RelativePosition;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Stream;
 
 public class GameBoard {
 
@@ -51,47 +46,51 @@ public class GameBoard {
     }
 
     public boolean isAllCellChecked() {
-        return Arrays.stream(board)
-                .flatMap(Arrays::stream)
-                .allMatch(Cell::isChecked);
+        Cells cells = Cells.from(board);
+        return cells.isAllCellChecked();
     }
 
     public void initiallizeGame() {
-        int rowSize = getRowSize();
-        int colSize = getColSize();
-        for (int row = 0; row < rowSize; row++) {
-            for (int col = 0; col < colSize; col++) {
-                board[row][col] = new EmptyCell();
+        CellPositions cellPositions = CellPositions.from(board);
+
+        InitializeEmptyCells(cellPositions);
+
+        List<CellPosition> landMinePositions = cellPositions.extractRandomPositions(landMineCount);
+        initiallizeLandMIneCells(landMinePositions);
+
+        List<CellPosition> numberPositionCandidates = cellPositions.subtract(landMinePositions);
+        initiallizeNumberCells(numberPositionCandidates);
+    }
+
+    private void initiallizeNumberCells(List<CellPosition> numberPositionCandidates) {
+        for (CellPosition candidatePosition : numberPositionCandidates){
+            int count = countNearbyLandMines(candidatePosition);
+            if (count != 0){
+                updateCellAt(candidatePosition,new NumberCell(count));
             }
         }
+    }
 
-        for (int i = 0; i < landMineCount; i++) {
-            int landMineCol = new Random().nextInt(colSize);
-            int landMineRow = new Random().nextInt(rowSize);
-            LandMineCell landMineCell = new LandMineCell();
-            board[landMineRow][landMineCol]  = landMineCell;
+    private void initiallizeLandMIneCells(List<CellPosition> landMinePositions) {
+        for(CellPosition position : landMinePositions){
+            updateCellAt(position, new LandMineCell());
         }
+    }
 
-        for (int row = 0; row < rowSize; row++) {
-            for (int col = 0; col < colSize; col++) {
-                CellPosition cellPosition = CellPosition.of(row,col);
-                if (isLandMineCellAt(cellPosition)) {
-                    continue;
-                }
-                int count = countNearbyLandMines(cellPosition);
-                if(count == 0){
-                    continue;
-                }
-                board[row][col] = new NumberCell(count);
-            }
+    private void InitializeEmptyCells(CellPositions cellPositions) {
+        List<CellPosition> allPositions = cellPositions.getPositions();
+        for(CellPosition position : allPositions){
+            updateCellAt(position, new EmptyCell());
         }
+    }
+
+    private void updateCellAt(CellPosition landMinePosition,Cell cell) {
+        board[landMinePosition.getRowIndex()][landMinePosition.getColIndex()] = cell;
     }
 
     public int countNearbyLandMines(CellPosition cellPosition) {
         int rowSize = getRowSize();
         int colSize = getColSize();
-        int row = cellPosition.getRowIndex();
-        int col = cellPosition.getColIndex();
 
         long count = calculateSurroundedPositions(cellPosition, rowSize, colSize).stream()
                 .filter(this::isLandMineCellAt)
