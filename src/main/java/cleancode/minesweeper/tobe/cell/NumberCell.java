@@ -30,6 +30,16 @@ public class NumberCell implements Cell {
         return UNCHECKED_SIGN;
     }
 
+    public CellSnapshot getSnapshot() {
+        if (cellState.isOpened()){
+            return CellSnapshot.ofEmpty();
+        }
+        if(cellState.isFlagged()){
+            return CellSnapshot.ofNumber(nearbyLandMineCount);
+        }
+        return CellSnapshot.ofUnchecked();
+    }
+
     @Override
     public void flag() {
         cellState.flag();
