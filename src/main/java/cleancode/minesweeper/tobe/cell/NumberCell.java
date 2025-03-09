@@ -19,17 +19,6 @@ public class NumberCell implements Cell {
         return true;
     }
 
-    @Override
-    public String getSign() {
-        if (cellState.isOpened()){
-            return String.valueOf(nearbyLandMineCount);
-        }
-        if(cellState.isFlagged()){
-            return FLAG_SIGN;
-        }
-        return UNCHECKED_SIGN;
-    }
-
     public CellSnapshot getSnapshot() {
         if (cellState.isOpened()){
             return CellSnapshot.ofEmpty();

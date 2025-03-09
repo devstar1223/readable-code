@@ -14,17 +14,6 @@ public class EmptyCell implements Cell {
         return false;
     }
 
-    @Override
-    public String getSign() {
-        if (cellState.isOpened()){
-            return EMPTY_SIGN;
-        }
-        if(cellState.isFlagged()){
-            return FLAG_SIGN;
-        }
-        return UNCHECKED_SIGN;
-    }
-
     public CellSnapshot getSnapshot() {
         if (cellState.isOpened()){
             return CellSnapshot.ofEmpty();
