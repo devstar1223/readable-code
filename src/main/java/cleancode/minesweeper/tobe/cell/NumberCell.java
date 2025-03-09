@@ -21,10 +21,10 @@ public class NumberCell implements Cell {
 
     public CellSnapshot getSnapshot() {
         if (cellState.isOpened()){
-            return CellSnapshot.ofEmpty();
+            return CellSnapshot.ofNumber(nearbyLandMineCount);
         }
         if(cellState.isFlagged()){
-            return CellSnapshot.ofNumber(nearbyLandMineCount);
+            return CellSnapshot.ofFlag();
         }
         return CellSnapshot.ofUnchecked();
     }
