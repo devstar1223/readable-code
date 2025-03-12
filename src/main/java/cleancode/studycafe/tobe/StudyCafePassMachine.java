@@ -32,12 +32,7 @@ public class StudyCafePassMachine {
             outputHandler.askPassTypeSelection();
             StudyCafePassType studyCafePassType = inputHandler.getPassTypeSelectingUserAction();
 
-            StudyCafePasses studyCafePasses = StudyCafePasses.of(studyCafeFileHandler.readStudyCafePasses());
-
-            List<StudyCafePass> purchasablePassList = studyCafePasses.getStudyCafePasses(studyCafePassType);
-            outputHandler.showPassListForSelection(purchasablePassList);
-
-            StudyCafePass selectedPass = inputHandler.getSelectPass(purchasablePassList);
+            StudyCafePass selectedPass = getStudyCafePass(studyCafePassType);
 
             if (studyCafePassType == StudyCafePassType.HOURLY) {
                 outputHandler.showPassOrderSummary(selectedPass, null);
@@ -70,6 +65,15 @@ public class StudyCafePassMachine {
         } catch (Exception e) {
             outputHandler.showSimpleMessage("알 수 없는 오류가 발생했습니다.");
         }
+    }
+
+    private StudyCafePass getStudyCafePass(StudyCafePassType studyCafePassType) {
+        StudyCafePasses studyCafePasses = StudyCafePasses.of(studyCafeFileHandler.readStudyCafePasses());
+
+        List<StudyCafePass> purchasablePassList = studyCafePasses.getStudyCafePasses(studyCafePassType);
+        outputHandler.showPassListForSelection(purchasablePassList);
+
+        return inputHandler.getSelectPass(purchasablePassList);
     }
 
 }
