@@ -32,20 +32,10 @@ public class StudyCafePassMachine {
 
             StudyCafePass selectedPass = getStudyCafePass(studyCafePassType);
 
-            StudyCafeLockerPasses studyCafeLockerPasses = StudyCafeLockerPasses.of(studyCafeFileHandler.readLockerPasses());
-            Optional<StudyCafeLockerPass> optionalStudyCafeLockerPass = studyCafeLockerPasses.getStudyCafeLockerPass(selectedPass);
-            if(optionalStudyCafeLockerPass.isPresent()){
-                StudyCafeLockerPass studyCafeLockerPass = optionalStudyCafeLockerPass.get();
+            StudyCafeLockerPass lockerPass = processLockerPass(selectedPass);
 
-                outputHandler.askLockerPass(studyCafeLockerPass);
-                if (inputHandler.getLockerSelection()) {
-                    outputHandler.showPassOrderSummary(selectedPass, studyCafeLockerPass);
-                } else {
-                    outputHandler.showPassOrderSummary(selectedPass, null);
-                }
-            }else{
-                outputHandler.showPassOrderSummary(selectedPass, null);
-            }
+            outputHandler.showPassOrderSummary(selectedPass, lockerPass);
+
         } catch (AppException e) {
             outputHandler.showSimpleMessage(e.getMessage());
         } catch (Exception e) {
@@ -62,4 +52,16 @@ public class StudyCafePassMachine {
         return inputHandler.getSelectPass(purchasablePassList);
     }
 
+    private StudyCafeLockerPass processLockerPass(StudyCafePass selectedPass) {
+        StudyCafeLockerPasses lockerPasses = StudyCafeLockerPasses.of(studyCafeFileHandler.readLockerPasses());
+
+        return Optional.of(lockerPasses)
+                .filter(lp -> lp.isPurchasable(selectedPass))
+                .map(lp -> lp.getStudyCafeLockerPass(selectedPass))
+                .filter(lp -> {
+                    outputHandler.askLockerPass(lp);
+                    return inputHandler.getLockerSelection();
+                })
+                .orElse(null);
+    }
 }

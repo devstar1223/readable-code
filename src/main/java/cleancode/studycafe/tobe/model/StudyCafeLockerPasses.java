@@ -14,12 +14,21 @@ public class StudyCafeLockerPasses {
         return new StudyCafeLockerPasses(studyCafeLockerPassList);
     }
 
-    public Optional<StudyCafeLockerPass> getStudyCafeLockerPass(StudyCafePass studyCafePass){
+    public StudyCafeLockerPass getStudyCafeLockerPass(StudyCafePass studyCafePass){
         return studyCafeLockerPasses.stream()
                 .filter(option ->
                         option.getPassType() == studyCafePass.getPassType()
                                 && option.getDuration() == studyCafePass.getDuration()
                 )
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("사물함을 구매할 수 있는 상태가 아닙니다."));
+    }
+
+    public boolean isPurchasable(StudyCafePass studyCafePass){
+        return studyCafeLockerPasses.stream()
+                .anyMatch(option ->
+                        option.getPassType() == studyCafePass.getPassType()
+                                && option.getDuration() == studyCafePass.getDuration()
+                );
     }
 }
