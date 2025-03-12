@@ -5,12 +5,10 @@ import cleancode.studycafe.tobe.exception.AppException;
 import cleancode.studycafe.tobe.io.InputHandler;
 import cleancode.studycafe.tobe.io.OutputHandler;
 import cleancode.studycafe.tobe.io.StudyCafeFileHandler;
-import cleancode.studycafe.tobe.model.StudyCafeLockerPass;
-import cleancode.studycafe.tobe.model.StudyCafePass;
-import cleancode.studycafe.tobe.model.StudyCafePassType;
-import cleancode.studycafe.tobe.model.StudyCafePasses;
+import cleancode.studycafe.tobe.model.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public class StudyCafePassMachine {
 
@@ -34,31 +32,19 @@ public class StudyCafePassMachine {
 
             StudyCafePass selectedPass = getStudyCafePass(studyCafePassType);
 
-            if (studyCafePassType == StudyCafePassType.HOURLY) {
-                outputHandler.showPassOrderSummary(selectedPass, null);
-            } else if (studyCafePassType == StudyCafePassType.WEEKLY) {
-                outputHandler.showPassOrderSummary(selectedPass, null);
-            } else if (studyCafePassType == StudyCafePassType.FIXED) {
-                List<StudyCafeLockerPass> lockerPasses = studyCafeFileHandler.readLockerPasses();
-                StudyCafeLockerPass lockerPass = lockerPasses.stream()
-                    .filter(option ->
-                        option.getPassType() == selectedPass.getPassType()
-                            && option.getDuration() == selectedPass.getDuration()
-                    )
-                    .findFirst()
-                    .orElse(null);
+            StudyCafeLockerPasses studyCafeLockerPasses = StudyCafeLockerPasses.of(studyCafeFileHandler.readLockerPasses());
+            Optional<StudyCafeLockerPass> optionalStudyCafeLockerPass = studyCafeLockerPasses.getStudyCafeLockerPass(selectedPass);
+            if(optionalStudyCafeLockerPass.isPresent()){
+                StudyCafeLockerPass studyCafeLockerPass = optionalStudyCafeLockerPass.get();
 
-                boolean lockerSelection = false;
-                if (lockerPass != null) {
-                    outputHandler.askLockerPass(lockerPass);
-                    lockerSelection = inputHandler.getLockerSelection();
-                }
-
-                if (lockerSelection) {
-                    outputHandler.showPassOrderSummary(selectedPass, lockerPass);
+                outputHandler.askLockerPass(studyCafeLockerPass);
+                if (inputHandler.getLockerSelection()) {
+                    outputHandler.showPassOrderSummary(selectedPass, studyCafeLockerPass);
                 } else {
                     outputHandler.showPassOrderSummary(selectedPass, null);
                 }
+            }else{
+                outputHandler.showPassOrderSummary(selectedPass, null);
             }
         } catch (AppException e) {
             outputHandler.showSimpleMessage(e.getMessage());
