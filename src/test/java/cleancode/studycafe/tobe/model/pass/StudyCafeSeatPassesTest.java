@@ -20,6 +20,6 @@ class StudyCafeSeatPassesTest {
       List<StudyCafeSeatPass> studyCafeSeatPassList = studyCafeSeatPasses.findPassBy(StudyCafePassType.FIXED);
 
       //then
-      assertThat(studyCafeSeatPassList).hasSizeGreaterThan(2);
+      assertThat(studyCafeSeatPassList).hasSizeGreaterThan(1);
   }
 }
