@@ -1,6 +1,7 @@
 package cleancode.studycafe.tobe.model.pass;
 
 import cleancode.studycafe.tobe.model.pass.locker.StudyCafeLockerPass;
+import cleancode.studycafe.tobe.model.pass.locker.StudyCafeLockerPasses;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -38,5 +39,22 @@ class StudyCafeSeatPassTest {
         assertThat(unPurchasableLockerPass).isEqualTo(false);
         assertThat(purchasableLockerPass).isEqualTo(true);
         assertThat(notMatchPurchasableLockerPass).isEqualTo(false);
+    }
+
+    @DisplayName("좌석 이용권의 기간과 좌석타입이 사물함 이용권과 동일한지 확인한다.")
+    @Test
+    void cafePassDurationAndTypeSameLockerPass() {
+        //given
+        StudyCafeSeatPass studyCafeSeatPassWeekly = StudyCafeSeatPass.of(StudyCafePassType.WEEKLY, 12, 400000, 0.15);
+        StudyCafeSeatPass studyCafeSeatPassFixed = StudyCafeSeatPass.of(StudyCafePassType.FIXED, 12, 700000, 0.15);
+        StudyCafeLockerPass studyCafeLockerPass = StudyCafeLockerPass.of(StudyCafePassType.FIXED,12,30000);
+
+        //when
+        boolean isSame = studyCafeSeatPassWeekly.isSameDurationType(studyCafeLockerPass);
+        boolean isSame2 = studyCafeSeatPassFixed.isSameDurationType(studyCafeLockerPass);
+
+        //then
+        assertThat(isSame).isFalse();
+        assertThat(isSame2).isTrue();
     }
 }
